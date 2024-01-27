@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Customer;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
@@ -12,54 +13,48 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        //
+        $Customers=Customer::all();
+        return response()->json(["Customers"=>$Customers]);
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            "name"=>"required",
+            // "email"=>"required",
+            "telephone"=>"required",
+            "City"=>"required",
+            // "Country"=>"required",
+        ]);
+        $Customer=new Customer();
+        $Customer->name=$request->name;
+        $Customer->email=$request->email;
+        $Customer->telephone=$request->telephone;
+        $Customer->City=$request->City;
+        $Customer->Country=$request->Country;
+        $Customer->save();
+        return response()->json(["message"=>"Success Added Provider"]);
+    }
+    public function show(Customer $Customer)
+    {
+        return response()->json(["Customer"=>$Customer]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function update(Request $request, Customer $Customer)
     {
-        //
+        $request->validate([
+            "name"=>"required",
+            // "email"=>"required",
+            "telephone"=>"required",
+            "City"=>"required",
+            // "Country"=>"required",
+        ]);
+        $Customer->update($request->post());
+        return response()->json(["message"=>"Success Updated Provider"]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function destroy(Customer $Customer)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $Customer->delete();
+        return response()->json(["message"=>"Success Deleted Provider"]);
     }
 }

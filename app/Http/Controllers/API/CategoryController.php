@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
@@ -12,54 +15,71 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        $Categories=Category::all();
+        return response()->json(["Categories"=>$Categories,"Status"=>"Imported categories successfully"]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'Name' =>'required',
+            // 'Image' =>'required|image',
+        ]);
+        if ($request->hasFile('Image')) {
+            $file=$request->file('Image');
+            $filename=$file->getClientOriginalExtension();
+            $imageName=Str::random().'.'.$filename;
+            Storage::disk('public')->makeDirectory('Images/Category');
+            Storage::disk('public')->put('Images/Category/'. $imageName, file_get_contents($file));
+            Category::create($request->post()+['Image'=>$imageName]);
+        }
+        else{
+            Category::create($request->post());
+        }
+        return response()->json(["status"=>"Success Added Category "]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+
+    public function show(Category $Category)
     {
-        //
+        // $Category->load('provider');
+        return response()->json(["Category"=>$Category]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, Category $Category)
     {
-        //
+        $request->validate([
+            // 'Name' =>'required',
+            // 'Image' =>'required|image',
+        ]);
+        if ($request->hasFile('Image')) {
+            if($Category->Image){
+                $exist=Storage::disk('public')->exists("Images/Category/{$Category->Image}");
+                if($exist){
+                    Storage::disk('public')->delete("Images/Category/{$Category->Image}");
+                }
+            }
+            $file=$request->file('Image');
+            $filename=$file->getClientOriginalExtension();
+            $imageName=Str::random().'.'.$filename;
+            Storage::disk('public')->makeDirectory('Images/Category');
+            Storage::disk('public')->put('Images/Category/'. $imageName, file_get_contents($file));
+            $Category->Image=$imageName;
+        }
+        $Category->fill($request->post())->update();
+        $Category->save();
+        return response()->json(["status"=>"Success Updated Category "]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy(Category $Category)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        if($Category->Image){
+            $exist=Storage::disk('public')->exists("Images/Category/{$Category->Image}");
+            if($exist){
+                Storage::disk('public')->delete("Images/Category/{$Category->Image}");          
+            }
+        }
+        $Category->delete();
+        return response()->json(["status"=>"Success Deleted Category "]);
     }
 }

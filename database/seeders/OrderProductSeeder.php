@@ -6,7 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class OrdersProductsSeeder extends Seeder
+class OrderProductSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -20,7 +20,7 @@ class OrdersProductsSeeder extends Seeder
         $numberOfRecords = 10;
 
         for ($i = 0; $i < $numberOfRecords; $i++) {
-            DB::table('orders_products')->insert([
+            DB::table('order_product')->insert([
                 'Order_id' => $this->getRandomElement($orders),
                 'Product_id' => $this->getRandomElement($products),
                 'Quantity' => rand(1, 5), // Adjust as needed

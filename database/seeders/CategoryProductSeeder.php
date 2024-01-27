@@ -6,7 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class CategoriesProductsSeeder extends Seeder
+class CategoryProductSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -20,7 +20,7 @@ class CategoriesProductsSeeder extends Seeder
         $numberOfRecords = 10;
 
         for ($i = 0; $i < $numberOfRecords; $i++) {
-            DB::table('categories_products')->insert([
+            DB::table('category_product')->insert([
                 'Category_id' => $this->getRandomElement($categories),
                 'Product_id' => $this->getRandomElement($products),
                 'created_at' => now(),

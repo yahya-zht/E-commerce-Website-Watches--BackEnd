@@ -22,7 +22,7 @@ class ProductController extends Controller
         // $Providers=Provider::all();
         // print_r($Products->provider->Name);
         // return response()->json(['Products'=>$Products,'Providers'=>$Providers,'status'=>'imported products successfully ']);
-        return response()->json(['Products'=>$Products,'status'=>'imported products successfully ']);
+        return response()->json(['Products'=>$Products,'status'=>'Imported products successfully ']);
     }
 
     public function store(Request $request)
@@ -32,12 +32,12 @@ class ProductController extends Controller
             'Name' =>'required',
             'Description' =>'required',
             'Image_Product' =>'required|image',
-            'Price_Purchase' =>'required',
-            'Price_First' =>'required',
-            'Price_Sale' =>'required',
-            'Quantity' =>'required',
-            'Sales' =>'required',
-            'provider_id' =>'required',
+            'Price_Purchase' =>'required|numeric',
+            'Price_First' =>'required|numeric',
+            'Price_Sale' =>'required|numeric',
+            'Quantity' =>'required|numeric',
+            'Sales' =>'required|numeric',
+            // 'provider_id' =>'required',
         ]);
          if ($request->hasFile('Image_Product')) {
             $file=$request->file('Image_Product');
@@ -70,7 +70,7 @@ class ProductController extends Controller
             'Price_Sale' =>'required',
             'Quantity' =>'required',
             'Sales' =>'required',
-            'provider_id' =>'required',
+            // 'provider_id' =>'required',
         ]);
         $Product->fill($request->post())->update();
         if ($request->hasFile('Image_Product')) {
@@ -88,17 +88,6 @@ class ProductController extends Controller
             Storage::disk('public')->put('Images/product/'. $imageName, file_get_contents($file));
             $Product->Image_Product=$imageName;
         }
-        // if($request->hasFile('image')){
-        //     if($Product->image){
-        //         $exist=Storage::disk('public')->exists("Product/images/{$Product->image}");
-        //         if($exist){
-        //             Storage::disk('public')->delete("Product/images/{$Product->image}");
-        //         }
-        //     }
-        //     $imageName=Str::random().'.'.$request->image->extension();
-        //     // Storage::disk('public')->putFileAs('Product/images',$request->image,$imageName);
-        //     $Product->image=$imageName;
-        // }
         $Product->save();
         return response()->json(["status"=>"Success Updated Product "]);
     }
