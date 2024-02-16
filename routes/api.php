@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\API\Auth\PassportAuthController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\CustomerController;
 use App\Http\Controllers\API\DashboardController;
+use App\Http\Controllers\API\GuestController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\ProviderController;
@@ -23,9 +25,19 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::resource('Products',ProductController::class);
-Route::resource('Providers',ProviderController::class);
-Route::resource('Categories',CategoryController::class);
-Route::resource('Customers',CustomerController::class);
-Route::resource('Orders',OrderController::class);
-Route::get('Dashboard',[DashboardController::class,'index'])->name('Dashboard');
+Route::post('register',[PassportAuthController::class,'register']);
+Route::post('login',[PassportAuthController::class,'login']);
+Route::middleware(['auth:api'])->group(function(){
+    Route::post('Admin/logout',[PassportAuthController::class,'logout']);
+    Route::get('Admin/userInfo',[PassportAuthController::class,'userInfo']);
+    Route::resource('Admin/Providers',ProviderController::class);
+    Route::resource('Admin/Categories',CategoryController::class);
+    Route::resource('Admin/Products',ProductController::class);
+    Route::resource('Admin/Customers',CustomerController::class);
+    Route::resource('Admin/Orders',OrderController::class);
+    Route::get('Admin/Dashboard',[DashboardController::class,'index']);
+});
+Route::post('Order',[OrderController::class,'store'])->name('Order');
+Route::get('products',[GuestController::class,'Products']);
+Route::get('products/{id}',[GuestController::class,'ShowProduct']);
+Route::get('categories',[GuestController::class,'Categories']);

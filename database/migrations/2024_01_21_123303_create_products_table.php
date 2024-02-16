@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('Ref')->unique();
             $table->string('Name');
-            $table->string('Description');
+            $table->longText('Description');
             $table->string('Image_Product');
             $table->integer('Price_Purchase');
             $table->integer('Price_First');
