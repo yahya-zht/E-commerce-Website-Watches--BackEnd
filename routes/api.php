@@ -5,6 +5,7 @@ use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\CustomerController;
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\GuestController;
+use App\Http\Controllers\API\MessageController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\ProviderController;
@@ -37,6 +38,7 @@ Route::middleware(['auth:api'])->group(function(){
     Route::resource('Admin/Orders',OrderController::class);
     Route::get('Admin/Dashboard',[DashboardController::class,'index']);
 });
+Route::post('Message',[MessageController::class,'store']);
 Route::post('Order',[OrderController::class,'store'])->name('Order');
 Route::get('products',[GuestController::class,'Products']);
 Route::get('products/{id}',[GuestController::class,'ShowProduct']);
