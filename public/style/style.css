@@ -1,0 +1,31 @@
+.message-container {
+    background-color: #f8f8f8;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Header style */
+.header {
+    display: flex;
+    justify-content: space-between;
+    background-color: #919090a5; /* Red */
+    color: #ffff00; /* Yellow */
+    padding: 10px;
+    border-radius: 6px;
+}
+
+/* Email section style */
+.email-section {
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+/* Message section style */
+.message-section {
+    margin-top: 20px;
+}
+.flex {
+    display: flex;
+    justify-content: space-between;
+}

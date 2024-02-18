@@ -36,6 +36,8 @@ Route::middleware(['auth:api'])->group(function(){
     Route::resource('Admin/Products',ProductController::class);
     Route::resource('Admin/Customers',CustomerController::class);
     Route::resource('Admin/Orders',OrderController::class);
+    Route::resource('Admin/Messages',MessageController::class);
+    Route::get('Admin/Messages/{id}/download',[MessageController::class,'downloadPDF']);
     Route::get('Admin/Dashboard',[DashboardController::class,'index']);
 });
 Route::post('Message',[MessageController::class,'store']);

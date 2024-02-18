@@ -4,6 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Message;
+use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
+use Barryvdh\DomPDF\PDF;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Illuminate\Http\Request;
 
 class MessageController extends Controller
@@ -40,10 +44,32 @@ class MessageController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Message $message)
+    public function show(Message $Message)
     {
-        //
+        return response()->json(["Message"=>$Message]);
     }
+    // public function downloadPDF(string $id){
+    //     $Message=Message::find($id);
+    //     // $invoice=$request->input();
+    //     $html = view('Message_pdf', compact('Message'))->render();
+    //     $dompdf = new Dompdf();
+    //     $options = new Options();
+    //     $dompdf->setOptions($options);
+    //     $dompdf->loadHtml($html);
+    //     $dompdf->setPaper('A4', 'portrait');
+    //     $dompdf->render();
+    //     return $dompdf->stream('invoice.pdf');
+    // }
+public function downloadPDF($id) {
+    $Message = Message::findOrFail($id);
+    // Logic to generate the PDF or fetch it from storage
+
+    // Example: Generate PDF using Dompdf
+    $pdf = FacadePdf::loadView('Message_pdf', compact('Message'));
+
+    // You can customize the file name here
+    return $pdf->download('invoice.pdf');
+}
 
     /**
      * Update the specified resource in storage.
@@ -56,9 +82,9 @@ class MessageController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Message $message)
+    public function destroy(Message $Message)
     {
-        $message->delete();
-        return response()->json(["Message"=>$message,"Status"=>"Message Deleted"]);
+        $Message->delete();
+        return response()->json(["Message"=>$Message,"Status"=>"Message Deleted"]);
     }
 }
