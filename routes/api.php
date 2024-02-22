@@ -45,3 +45,9 @@ Route::post('Order',[OrderController::class,'store'])->name('Order');
 Route::get('products',[GuestController::class,'Products']);
 Route::get('products/{id}',[GuestController::class,'ShowProduct']);
 Route::get('categories',[GuestController::class,'Categories']);
+
+Route::get('Admin/products/search/{query}', [ProductController::class,'search']);
+Route::get('Admin/Orders/search/{query}', [OrderController::class,'search']);
+Route::get('Admin/Customers/search/{query}', [CustomerController::class,'search']);
+Route::get('Admin/Categories/search/{query}', [CategoryController::class,'search']);
+Route::get('Admin/Providers/search/{query}', [ProviderController::class,'search']);

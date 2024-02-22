@@ -104,4 +104,19 @@ class ProductController extends Controller
         $Product->delete();
         return response()->json(["status"=>"Success Deleted Product "]);
     }
+    // public function search(Request $request){
+    //     dd($request->post());
+    //     $Search=$request->post('query');
+    //     $Products=Product::where('Name','Ref','%'.$Search.'%')->get();
+    //     return response()->json(["Products"=>$Products]);
+    // }
+    public function search($query)
+    {
+        if (!empty($query)) {
+            $products = Product::where('Ref', 'like', "%$query%")->get();
+            return response()->json($products);
+        } else {
+            return response()->json([], 400);
+        }
+    }
 }

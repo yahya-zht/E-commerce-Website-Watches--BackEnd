@@ -111,4 +111,13 @@ class OrderController extends Controller
         return response()->json(["Order"=>$Order,"Status"=>"Order Deleted"]);
         
     }
+    public function search($query)
+    {
+        if (!empty($query)) {
+            $products = Order::where('Ref', 'like', "%$query%")->get();
+            return response()->json($products);
+        } else {
+            return response()->json([], 400);
+        }
+    }
 }

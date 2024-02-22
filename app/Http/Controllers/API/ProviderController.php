@@ -60,4 +60,13 @@ class ProviderController extends Controller
         $Provider->delete();
         return response()->json(["status"=>"Success Deleted Provider "]);
     }
+    public function search($query)
+    {
+        if (!empty($query)) {
+            $products = Provider::where('Ref', 'like', "%$query%")->get();
+            return response()->json($products);
+        } else {
+            return response()->json([], 400);
+        }
+    }
 }

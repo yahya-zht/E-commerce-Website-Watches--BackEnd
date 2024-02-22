@@ -82,4 +82,13 @@ class CategoryController extends Controller
         $Category->delete();
         return response()->json(["status"=>"Success Deleted Category "]);
     }
+    public function search($query)
+    {
+        if (!empty($query)) {
+            $products = Category::where('Name', 'like', "%$query%")->get();
+            return response()->json($products);
+        } else {
+            return response()->json([], 400);
+        }
+    }
 }

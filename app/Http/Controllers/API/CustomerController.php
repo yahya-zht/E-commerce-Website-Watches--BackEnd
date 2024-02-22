@@ -57,4 +57,13 @@ class CustomerController extends Controller
         $Customer->delete();
         return response()->json(["message"=>"Success Deleted Provider"]);
     }
+    public function search($query)
+    {
+        if (!empty($query)) {
+            $products = Customer::where('telephone', 'like', "%$query%")->get();
+            return response()->json($products);
+        } else {
+            return response()->json([], 400);
+        }
+    }
 }
