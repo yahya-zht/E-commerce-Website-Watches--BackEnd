@@ -22,87 +22,104 @@ class ProductController extends Controller
         // $Providers=Provider::all();
         // print_r($Products->provider->Name);
         // return response()->json(['Products'=>$Products,'Providers'=>$Providers,'status'=>'imported products successfully ']);
-        return response()->json(['Products'=>$Products,'status'=>'Imported products successfully ']);
+        return response()->json(['Products' => $Products, 'status' => 'Imported products successfully ']);
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'Ref' =>'required',
-            'Name' =>'required',
-            'Description' =>'required',
-            'Image_Product' =>'required|image',
-            'Price_Purchase' =>'required|numeric',
-            'Price_First' =>'required|numeric',
-            'Price_Sale' =>'required|numeric',
-            'Quantity' =>'required|numeric',
-            'Sales' =>'required|numeric',
+            'Ref' => 'required',
+            'Name' => 'required',
+            'Description' => 'required',
+            'Image_Product' => 'required|image',
+            'Price_Purchase' => 'required|numeric',
+            'Price_First' => 'required|numeric',
+            'Price_Sale' => 'required|numeric',
+            'Quantity' => 'required|numeric',
+            'Sales' => 'required|numeric',
             // 'provider_id' =>'required',
         ]);
-         if ($request->hasFile('Image_Product')) {
-            $file=$request->file('Image_Product');
-            $filename=$file->getClientOriginalExtension();
-            $imageName=Str::random().'.'.$filename;
+        if ($request->hasFile('Image_Product')) {
+            $file = $request->file('Image_Product');
+            $filename = $file->getClientOriginalExtension();
+            $imageName = Str::random() . '.' . $filename;
             Storage::disk('public')->makeDirectory('Images/product');
             // Storage::disk('public')->putFileAs('Product/images/',$filename,$imageName);
-             Storage::disk('public')->put('Images/product/'. $imageName, file_get_contents($file));
+            Storage::disk('public')->put('Images/product/' . $imageName, file_get_contents($file));
         }
         // Product::create($request->post());
-        Product::create($request->post()+['Image_Product'=>$imageName]);
-        return response()->json(["status"=>"Success Added Product "]);
+        $Product = Product::create($request->post() + ['Image_Product' => $imageName]);
+        $Product->categories()->sync($request->input('categories', []));
+        return response()->json(["status" => "Success Added Product "]);
     }
 
     public function show(Product $Product)
     {
         // $Product=Product::with('provider')->find($Product->id);
-        $Product->load('provider');
-        return response()->json(["product"=>$Product]);
+        $Product->load('provider', 'categories');
+        return response()->json(["product" => $Product]);
     }
 
-    public function update(Request $request, Product $Product){
+    public function update(Request $request, Product $Product)
+    {
         $request->validate([
-            'Ref' =>'required',
-            'Name' =>'required',
-            'Description' =>'required',
-            'Image_Product' =>'nullable',
-            'Price_Purchase' =>'required',
-            'Price_First' =>'required',
-            'Price_Sale' =>'required',
-            'Quantity' =>'required',
-            'Sales' =>'required',
+            'Ref' => 'required',
+            'Name' => 'required',
+            'Description' => 'required',
+            'Image_Product' => 'nullable',
+            'Price_Purchase' => 'required',
+            'Price_First' => 'required',
+            'Price_Sale' => 'required',
+            'Quantity' => 'required',
+            'Sales' => 'required',
             // 'provider_id' =>'required',
         ]);
         $Product->fill($request->post())->update();
         if ($request->hasFile('Image_Product')) {
-            if($Product->Image_Product){
-                $exist=Storage::disk('public')->exists("Images/product/{$Product->Image_Product}");
-                if($exist){
+            if ($Product->Image_Product) {
+                $exist = Storage::disk('public')->exists("Images/product/{$Product->Image_Product}");
+                if ($exist) {
                     Storage::disk('public')->delete("Images/product/{$Product->Image_Product}");
                 }
             }
-            $file=$request->file('Image_Product');
-            $filename=$file->getClientOriginalExtension();
-            $imageName=Str::random().'.'.$filename;
+            $file = $request->file('Image_Product');
+            $filename = $file->getClientOriginalExtension();
+            $imageName = Str::random() . '.' . $filename;
             Storage::disk('public')->makeDirectory('Images/product');
             // Storage::disk('public')->putFileAs('Product/images/',$filename,$imageName);
-            Storage::disk('public')->put('Images/product/'. $imageName, file_get_contents($file));
-            $Product->Image_Product=$imageName;
+            Storage::disk('public')->put('Images/product/' . $imageName, file_get_contents($file));
+            $Product->Image_Product = $imageName;
         }
         $Product->save();
-        return response()->json(["status"=>"Success Updated Product "]);
+        // $Product->categories()->sync($request->input('categories', []));
+        $currentCategoryIds = $Product->categories()->pluck('categories.id')->toArray();
+
+        // Get selected category IDs from the request
+        $selectedCategoryIds = $request->input('categories', []);
+
+        // Determine categories to add and remove
+        $categoriesToAdd = array_diff($selectedCategoryIds, $currentCategoryIds);
+        $categoriesToRemove = array_diff($currentCategoryIds, $selectedCategoryIds);
+
+        // Add new associations
+        $Product->categories()->attach($categoriesToAdd);
+
+        // Remove associations
+        $Product->categories()->detach($categoriesToRemove);
+        return response()->json(["status" => "Success Updated Product "]);
     }
 
 
     public function destroy(Product $Product)
     {
-        if($Product->Image_Product){
-            $exist=Storage::disk('public')->exists("Images/product/{$Product->Image_Product}");
-            if($exist){
-                Storage::disk('public')->delete("Images/product/{$Product->Image_Product}");          
+        if ($Product->Image_Product) {
+            $exist = Storage::disk('public')->exists("Images/product/{$Product->Image_Product}");
+            if ($exist) {
+                Storage::disk('public')->delete("Images/product/{$Product->Image_Product}");
             }
         }
         $Product->delete();
-        return response()->json(["status"=>"Success Deleted Product "]);
+        return response()->json(["status" => "Success Deleted Product "]);
     }
     // public function search(Request $request){
     //     dd($request->post());
@@ -119,4 +136,14 @@ class ProductController extends Controller
             return response()->json([], 400);
         }
     }
+    public function searchName($query)
+    {
+        if (!empty($query)) {
+            $products = Product::where('Name', 'like', "%$query%")->get();
+            return response()->json($products);
+        } else {
+            return response()->json([], 400);
+        }
+    }
+    
 }
